@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Search with ChatGPT</title>
+    <link rel="stylesheet" href="chat.js">
+</head>
+<body>
+    <h1>Voice Search with ChatGPT</h1>
+    
+    <form id="searchForm" action="https://www.bing.com/search?" method="GET">
+        <input type="text" name="q" id="searchInput" placeholder="Say something..." autofocus>
+        <button type="button" id="startVoiceRecognition">Start Voice Recognition</button>
+        <button type="submit">Search</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        // Function to start speech recognition
+        function startVoiceRecognition() {
+            const searchInput = document.getElementById('searchInput');
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.start();
+
+                recognition.onresult = function (event) {
+                    const speechToText = event.results[0][0].transcript;
+                    searchInput.value = speechToText;
+
+                    // Automatically submit the form after setting the value
+                    document.getElementById('searchForm').submit();
+                };
+
+                recognition.onerror = function (event) {
+                    console.error(event.error);
+                };
+
+            } else {
+                alert('Speech Recognition is not supported in this browser.');
+            }
+        }
+
+        document.getElementById('startVoiceRecognition').addEventListener('click', startVoiceRecognition);
+    </script>
+</body>
+</html>

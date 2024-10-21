@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Search with Bing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #response {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Voice Search with Bing</h1>
+    
+    <input type="text" name="q" id="searchInput" placeholder="Say something..." autofocus>
+    <button type="button" id="startVoiceRecognition">Start Voice Recognition</button>
+    <div id="response"></div>
+
+    <script>
+        async function startVoiceRecognition() {
+            const searchInput = document.getElementById('searchInput');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.start();
+
+                recognition.onresult = async function (event) {
+                    const speechToText = event.results[0][0].transcript;
+                    searchInput.value = speechToText;
+
+                    // Perform search using Bing
+                    const bingSearchUrl = `https://www.bing.com/search?q=${encodeURIComponent(speechToText)}`;
+                    
+                    // Open Bing search results in a new tab
+                    window.open(bingSearchUrl, '_blank');
+
+                    // Speak the search query
+                    speakResult(`You searched for: ${speechToText}`);
+                };
+
+                recognition.onerror = function (event) {
+                    console.error(event.error);
+                };
+            } else {
+                alert('Speech Recognition is not supported in this browser.');
+            }
+        }
+
+        // Function to speak the final result
+        function speakResult(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            speechSynthesis.speak(utterance);
+        }
+
+        document.getElementById('startVoiceRecognition').addEventListener('click', startVoiceRecognition);
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Available Voices</title>
+</head>
+<body>
+    <h1>Check Available Voices</h1>
+    <button id="checkVoices">Check Voices</button>
+
+    <script>
+        document.getElementById('checkVoices').addEventListener('click', function() {
+            const voices = speechSynthesis.getVoices();
+            voices.forEach(voice => {
+                console.log(`Name: ${voice.name}, Lang: ${voice.lang}, Default: ${voice.default}`);
+            });
+        });
+
+        // Load voices
+        window.speechSynthesis.onvoiceschanged = function() {
+            // Automatically load voices when changed
+            const voices = speechSynthesis.getVoices();
+            voices.forEach(voice => {
+                console.log(`Name: ${voice.name}, Lang: ${voice.lang}, Default: ${voice.default}`);
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Recording and Playback</title>
+</head>
+<body>
+    <h1>Record and Playback Audio</h1>
+    <button id="startBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop Recording</button>
+    <audio id="audioPlayback" controls></audio>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        document.getElementById('startBtn').onclick = async () => {
+            // Request microphone access
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audioElement = document.getElementById('audioPlayback');
+                audioElement.src = audioUrl; // Set the source of the audio element to the recorded audio
+                audioChunks = []; // Clear the chunks for next recording
+            };
+
+            mediaRecorder.start();
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+        };
+
+        document.getElementById('stopBtn').onclick = () => {
+            mediaRecorder.stop();
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        };
+    </script>
+</body>
+</html>

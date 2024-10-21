@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Search with Auto-Send to ChatGPT</title>
+    <style>
+        /* Style for better visibility */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #searchInput {
+            width: 80%;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        #response {
+            margin-top: 20px;
+            font-size: 20px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Voice Search with Auto-Send to ChatGPT</h1>
+
+    <!-- Search Bar -->
+    <input type="text" id="searchInput" placeholder="Say something..." autofocus>
+    <button id="startVoiceRecognition">Start Voice Recognition</button>
+
+    <!-- Section to display response from ChatGPT -->
+    <div id="response"></div>
+
+    <script>
+        // Function to start speech recognition
+        function startVoiceRecognition() {
+            const searchInput = document.getElementById('searchInput');
+            const responseDiv = document.getElementById('response');
+
+            // Check if the browser supports Web Speech API
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+
+                recognition.lang = 'en-US'; // Set the language
+                recognition.interimResults = false; // To avoid showing intermediate results
+                recognition.maxAlternatives = 1;
+
+                // Start recognition
+                recognition.start();
+
+                // When speech is detected
+                recognition.onresult = function (event) {
+                    const speechToText = event.results[0][0].transcript;
+                    searchInput.value = speechToText;
+
+                    // Automatically submit or simulate send action
+                    autoSubmit();
+                };
+
+                // If there's an error
+                recognition.onerror = function (event) {
+                    console.error(event.error);
+                };
+
+            } else {
+                alert('Speech Recognition is not supported in this browser.');
+            }
+        }
+
+        // Function to simulate the auto-send (form submission) to ChatGPT API
+        function autoSubmit() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value;
+            const responseDiv = document.getElementById('response');
+
+            // Simulate a request to an AI service (like OpenAI's GPT API)
+            console.log('Query sent to ChatGPT:', query);
+
+            // You would normally send an API request here
+            // Example: fetch('/chatgpt-endpoint', { method: 'POST', body: JSON.stringify({ query }) })
+
+            // Mock response from ChatGPT
+            const mockResponse = "Here is the response to your query: " + query;
+
+            // Display the response in the div
+            responseDiv.innerText = mockResponse;
+        }
+
+        // Attach the startVoiceRecognition function to the button click
+        document.getElementById('startVoiceRecognition').addEventListener('click', startVoiceRecognition);
+    </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Search with Animated Background</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: colorChange 10s infinite alternate;
+        }
+
+        @keyframes colorChange {
+            0% { background-color: #ff7e5f; }
+            25% { background-color: #feb47b; }
+            50% { background-color: #86a8e7; }
+            75% { background-color: #91eae4; }
+            100% { background-color: #cc2b5e; }
+        }
+
+        h1 {
+            color: rgb(7, 48, 171);
+        }
+
+        input, button {
+            border: 0.1 black solid;
+            border-radius: 15px;
+            background-color: pink;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        iframe {
+            display: none;
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+   <center> <h1><u>Arshiv World</u></h1></center>
+   <center>
+       <input type="text" name="q" id="searchInput" placeholder="Say something..." autofocus>
+   </center><br><br>
+   <center>
+       <button type="button" id="startVoiceRecognition"> Start </button>
+   </center>
+   <div id="response"></div>
+   <iframe id="searchResults"></iframe>
+
+    <script>
+        function startVoiceRecognition() {
+            const searchInput = document.getElementById('searchInput');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-IN'; // Indian English
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.start();
+
+                recognition.onresult = function (event) {
+                    const speechToText = event.results[0][0].transcript.toLowerCase(); // Convert to lowercase
+                    searchInput.value = speechToText;
+
+                    // Determine which action to take
+                    let query;
+                    if (speechToText.includes('bing')) {
+                        query = speechToText.replace('bing', '').trim();
+                        performBingSearch(query);
+                    } else if (speechToText.includes('google') || speechToText.includes('arshiv')) {
+                        query = speechToText.replace(/google|arshiv/g, '').trim(); // Remove both keywords
+                        performGoogleSearch(query);
+                    } else if (speechToText.includes('flipkart')) {
+                        query = speechToText.replace('flipkart', '').trim();
+                        performFlipkartSearch(query);
+                    } else if (speechToText.includes('amazon')) {
+                        query = speechToText.replace('amazon', '').trim();
+                        performAmazonSearch(query);
+                    } else if (speechToText.startsWith('web')) {
+                        query = speechToText.replace('web', '').trim();
+                        performBingSearch(query); // Perform web search on Bing
+                    } else if (speechToText.includes('youtube')) {
+                        openYouTube(); // Open YouTube directly
+                    } else if (speechToText.includes('instagram')) {
+                        openInstagram(); // Open Instagram directly
+                    } else {
+                        query = speechToText; // Default to Google
+                        performGoogleSearch(query);
+                    }
+
+                    // Speak the result using the male voice
+                    speakResult(`Searching for ${speechToText}`);
+                };
+
+                recognition.onerror = function (event) {
+                    console.error(event.error);
+                };
+            } else {
+                alert('Speech Recognition is not supported in this browser.');
+            }
+        }
+
+        function performBingSearch(query) {
+            const iframe = document.getElementById('searchResults');
+            iframe.src = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+            iframe.style.display = 'block'; // Show iframe
+        }
+
+        function performGoogleSearch(query) {
+            const iframe = document.getElementById('searchResults');
+            iframe.src = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            iframe.style.display = 'block'; // Show iframe
+        }
+
+        function performFlipkartSearch(query) {
+            const iframe = document.getElementById('searchResults');
+            iframe.src = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
+            iframe.style.display = 'block'; // Show iframe
+        }
+
+        function performAmazonSearch(query) {
+            const iframe = document.getElementById('searchResults');
+            iframe.src = `https://www.amazon.in/s?k=${encodeURIComponent(query)}`; // Use Amazon India; change if needed
+            iframe.style.display = 'block'; // Show iframe
+        }
+
+        function openYouTube() {
+            const youtubeUrl = 'https://www.youtube.com';
+            window.open(youtubeUrl); // Open YouTube in a new tab
+        }
+
+        function openInstagram() {
+            const instagramUrl = 'https://www.instagram.com';
+            window.open(instagramUrl); // Open Instagram in a new tab
+        }
+
+        // Function to speak the final result in specified voice
+        function speakResult(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = getMaleVoice(); // Get a male voice
+            speechSynthesis.speak(utterance);
+        }
+
+        // Function to get a male voice
+        function getMaleVoice() {
+            const voices = speechSynthesis.getVoices();
+            // You can adjust the filter based on the available voices in your browser
+            return voices.find(voice => voice.name.includes('Male')) || voices[0]; // Return first available voice if no male voice found
+        }
+
+        document.getElementById('startVoiceRecognition').addEventListener('click', startVoiceRecognition);
+
+        // Load voices
+        window.speechSynthesis.onvoiceschanged = function() {
+            // Optionally, you can list available voices in the console
+            const voices = speechSynthesis.getVoices();
+            console.log(voices); // You can see all voices available in the console
+        };
+    </script>
+</body>
+</html>

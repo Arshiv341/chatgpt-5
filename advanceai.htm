@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Search</title>
+</head>
+<body>
+    <h1>Voice Search with Auto-Send</h1>
+    
+    <!-- Search Bar -->
+    <input type="text" id="searchInput" placeholder="Say something..." autofocus>
+    <button id="startVoiceRecognition">Start Voice Recognition</button>
+    
+    <script>
+        // Function to start speech recognition
+        function startVoiceRecognition() {
+            const searchInput = document.getElementById('searchInput');
+
+            // Check if the browser supports Web Speech API
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+
+                recognition.lang = 'en-US'; // You can set the language as per your requirement
+                recognition.interimResults = false; // To avoid showing intermediate results
+                recognition.maxAlternatives = 1;
+
+                // Start recognition
+                recognition.start();
+
+                // When speech is detected
+                recognition.onresult = function (event) {
+                    const speechToText = event.results[0][0].transcript;
+                    searchInput.value = speechToText;
+
+                    // Automatically submit or simulate send action
+                    autoSubmit();
+                };
+
+                // If there's an error
+                recognition.onerror = function (event) {
+                    console.error(event.error);
+                };
+
+            } else {
+                alert('Speech Recognition is not supported in this browser.');
+            }
+        }
+
+        // Function to simulate the auto-send (form submission)
+        function autoSubmit() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value;
+
+            // Simulate a search operation or send the data to the server
+            console.log('Search Query:', query);
+
+            // You can implement actual form submission or API call here
+            // For example: window.location.href = `https://www.google.com/search?q=${query}`;
+            alert('Search sent: ' + query);
+        }
+
+        // Attach the startVoiceRecognition function to the button click
+        document.getElementById('startVoiceRecognition').addEventListener('click', startVoiceRecognition);
+    </script>
+</body>
+</html>
